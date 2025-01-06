@@ -1,0 +1,49 @@
+
+
+#include <Encoder.h>
+int errorcw = 0;
+int errorccw = 0;
+int correction = 0;
+double kp = 342;
+double ki = 156;
+double kd = 72;
+int PID = 0;
+int error = 0;
+int last_error = 0;
+int angle = 0;
+int sp = 0;
+Encoder myEnc(2, 3);
+
+void setup()
+{
+Serial.begin(9600);
+pinMode(9, OUTPUT);
+pinMode(10, OUTPUT);
+pinMode(2, INPUT);
+pinMode(3, INPUT);
+
+}
+
+void loop()
+{
+angle = myEnc.read();
+Serial.println(angle);
+
+if(angle < sp)
+{
+errorcw = (sp-angle);
+correction = 500*(kp*errorcw + ki*(errorcw+last_error) + kd*(errorcw-last_error));
+last_error=errorcw;
+analogWrite(10, correction);
+digitalWrite(9, LOW);
+}
+if(angle > sp)
+{
+errorccw = (angle-sp);
+correction = 500*(kp*errorccw + ki*(errorccw+last_error) + kd*(errorccw-last_error));
+last_error=errorccw;
+analogWrite(9, correction);
+digitalWrite(10, LOW);
+}
+}
+
